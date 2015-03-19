@@ -589,6 +589,9 @@ func (c *Consumer) PostJson(url string, body string, token *AccessToken) (resp *
 func (c *Consumer) PostXML(url string, body string, token *AccessToken) (resp *http.Response, err error) {
 	return c.makeAuthorizedRequest("POST", url, LOC_XML, body, nil, token)
 }
+func (c *Consumer) PostBody(url string, body string, userParams map[string]string, token *AccessToken) (resp *http.Response, err error) {
+	return c.makeAuthorizedRequest("POST", url, 0, body, userParams, token)
+}
 
 // ** DEPRECATED **
 // Please call "Do" on the http client returned by MakeHttpClient instead
