@@ -155,7 +155,7 @@ func PrintResponse(resp *http.Response) {
 //Function to print out a http response
 func PrintRequest(req *http.Request) {
 	if req != nil {
-		s, err := httputil.DumpRequest(req, true)
+		s, err := httputil.DumpRequestOut(req, true)
 
 		if err == nil {
 			log.Println("Dumping Request => ", string(s))
@@ -606,7 +606,6 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 
 	if dataLocation == LOC_JSON {
 		request.Header.Set("Content-Type", "application/json")
-		request.Header.Set("Content-Length", strconv.Itoa(contentLength))
 	}
 
 	if dataLocation == LOC_XML {
