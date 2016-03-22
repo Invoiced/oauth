@@ -637,8 +637,9 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 	}
 
 	rt := RoundTripper{consumer: c, token: token}
-
+	PrintRequest(request)
 	resp, err = rt.RoundTrip(request)
+	PrintResponse(resp)
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
 		defer resp.Body.Close()
