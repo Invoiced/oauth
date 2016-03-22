@@ -47,9 +47,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"mime/multipart"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"sort"
 	"strconv"
@@ -134,6 +136,33 @@ func (sp *ServiceProvider) httpMethod() string {
 	}
 
 	return "GET"
+}
+
+//Function to print out a http request
+func PrintResponse(resp *http.Response) {
+	if resp != nil {
+
+		d, err := httputil.DumpResponse(resp, true)
+
+		if err == nil {
+			log.Println("Dumping Response => ", string(d))
+		}
+
+	}
+
+}
+
+//Function to print out a http response
+func PrintRequest(req *http.Request) {
+	if req != nil {
+		s, err := httputil.DumpRequest(req, true)
+
+		if err == nil {
+			log.Println("Dumping Request => ", string(s))
+		}
+
+	}
+
 }
 
 // Consumers are stateless, you can call the various methods (GetRequestTokenAndUrl,
@@ -416,7 +445,7 @@ func (c *Consumer) makeAccessTokenRequest(params map[string]string, secret strin
 
 type RoundTripper struct {
 	consumer *Consumer
-	token *AccessToken
+	token    *AccessToken
 }
 
 func (c *Consumer) MakeRoundTripper(token *AccessToken) (*RoundTripper, error) {
@@ -514,8 +543,6 @@ func (c *Consumer) Put(url string, body string, userParams map[string]string, to
 	return c.makeAuthorizedRequest("PUT", url, LOC_URL, body, userParams, token)
 }
 
-
-
 func (c *Consumer) Debug(enabled bool) {
 	c.debug = enabled
 	c.signer.Debug(enabled)
@@ -533,7 +560,7 @@ func (p pairs) Less(i, j int) bool { return p[i].key < p[j].key }
 func (p pairs) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 // This function has basically turned into a backwards compatibility layer
-// between the old API (where clients explicitly called consumer.Get() 
+// between the old API (where clients explicitly called consumer.Get()
 // consumer.Post() etc), and the new API (which takes actual http.Requests)
 //
 // So, here we construct the appropriate HTTP request for the inputs.
@@ -544,19 +571,19 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 	}
 
 	request := &http.Request{
-		Method: method,
-		URL: urlObject,
-		Header: http.Header{},
-		Body: body,
+		Method:        method,
+		URL:           urlObject,
+		Header:        http.Header{},
+		Body:          body,
 		ContentLength: int64(contentLength),
 	}
 
 	vals := url.Values{}
-	for k,v := range(userParams) {
+	for k, v := range userParams {
 		vals.Add(k, v)
 	}
 
-	if (dataLocation != LOC_BODY) {
+	if dataLocation != LOC_BODY {
 		request.URL.RawQuery = vals.Encode()
 	} else {
 		// TODO(mrjones): validate that we're not overrideing an exising body?
@@ -565,7 +592,7 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 	}
 
 	for k, vs := range c.AdditionalHeaders {
-		for _, v := range(vs) {
+		for _, v := range vs {
 			request.Header.Set(k, v)
 		}
 	}
@@ -672,7 +699,7 @@ func (rt *RoundTripper) RoundTrip(userRequest *http.Request) (*http.Response, er
 	if userRequest.Header.Get("Content-Type") !=
 		"application/x-www-form-urlencoded" {
 		// Most of the time we get parameters from the query string:
-		for k, vs := range(userRequest.URL.Query()) {
+		for k, vs := range userRequest.URL.Query() {
 			if len(vs) != 1 {
 				return nil, fmt.Errorf("Must have exactly one value per param")
 			}
@@ -693,7 +720,7 @@ func (rt *RoundTripper) RoundTrip(userRequest *http.Request) (*http.Response, er
 			return nil, err
 		}
 
-		for k, vs := range(params) {
+		for k, vs := range params {
 			if len(vs) != 1 {
 				return nil, fmt.Errorf("Must have exactly one value per param")
 			}
@@ -748,7 +775,7 @@ func (rt *RoundTripper) RoundTrip(userRequest *http.Request) (*http.Response, er
 	if rt.consumer.debug {
 		fmt.Printf("Request: %v\n", serverRequest)
 	}
-	
+
 	resp, err := rt.consumer.HttpClient.Do(serverRequest)
 
 	if err != nil {
@@ -1067,6 +1094,9 @@ func (c *Consumer) httpExecute(
 	if c.debug {
 		fmt.Printf("Request: %v\n", req)
 	}
+
+	PrintRequest(req)
+
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return nil, errors.New("Do: " + err.Error())
@@ -1091,6 +1121,8 @@ func (c *Consumer) httpExecute(
 			StatusCode:        resp.StatusCode,
 		}
 	}
+
+	PrintResponse(resp)
 	return resp, err
 }
 
