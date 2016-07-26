@@ -648,12 +648,13 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 		defer resp.Body.Close()
 		bytes, _ := ioutil.ReadAll(resp.Body)
 
-		return resp, HTTPExecuteError{
-			RequestHeaders:    "",
-			ResponseBodyBytes: bytes,
-			Status:            resp.Status,
-			StatusCode:        resp.StatusCode,
-		}
+		// return resp, HTTPExecuteError{
+		// 	RequestHeaders:    "",
+		// 	ResponseBodyBytes: bytes,
+		// 	Status:            resp.Status,
+		// 	StatusCode:        resp.StatusCode,
+		// }
+		return resp, errors.New(string(bytes))
 	}
 
 	return resp, nil
@@ -1118,12 +1119,14 @@ func (c *Consumer) httpExecute(
 		defer resp.Body.Close()
 		bytes, _ := ioutil.ReadAll(resp.Body)
 
-		return resp, HTTPExecuteError{
-			RequestHeaders:    debugHeader,
-			ResponseBodyBytes: bytes,
-			Status:            resp.Status,
-			StatusCode:        resp.StatusCode,
-		}
+		// return resp, HTTPExecuteError{
+		// 	RequestHeaders:    debugHeader,
+		// 	ResponseBodyBytes: bytes,
+		// 	Status:            resp.Status,
+		// 	StatusCode:        resp.StatusCode,
+		// }
+
+		return resp, errors.New(string(bytes))
 	}
 
 	PrintResponse(resp)
