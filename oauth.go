@@ -610,6 +610,8 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 		}
 	}
 
+	request.Header.Set("User-Agent", GetUserAgent())
+
 	if dataLocation == LOC_BODY {
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
@@ -1105,10 +1107,6 @@ func (c *Consumer) httpExecute(
 	if contentLength > 0 {
 		req.Header.Set("Content-Length", strconv.Itoa(contentLength))
 	}
-
-	req.Header.Set("User-Agent", userAgent)
-
-	log.Println("PRINTING OUT HEADER", req.Header)
 
 	if c.debug {
 		fmt.Printf("Request: %v\n", req)
