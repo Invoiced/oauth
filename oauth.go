@@ -100,7 +100,7 @@ const (
 	LOC_XML
 )
 
-var userAgent string = "Invoiced, Inc."
+var userAgent string = "Invoiced"
 
 func SetUserAgent(agent string) {
 	userAgent = agent
