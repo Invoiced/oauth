@@ -1108,6 +1108,8 @@ func (c *Consumer) httpExecute(
 
 	req.Header.Set("User-Agent", userAgent)
 
+	log.Println("PRINTING OUT HEADER", req.Header)
+
 	if c.debug {
 		fmt.Printf("Request: %v\n", req)
 	}
