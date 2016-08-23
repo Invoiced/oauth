@@ -100,6 +100,16 @@ const (
 	LOC_XML
 )
 
+var userAgent string = "Invoiced, Inc."
+
+func SetUserAgent(agent string) {
+	userAgent = agent
+}
+
+func GetUserAgent() string {
+	return userAgent
+}
+
 // Information about how to contact the service provider (see #1 above).
 // You usually find all of these URLs by reading the documentation for the service
 // that you're trying to connect to.
@@ -1095,6 +1105,8 @@ func (c *Consumer) httpExecute(
 	if contentLength > 0 {
 		req.Header.Set("Content-Length", strconv.Itoa(contentLength))
 	}
+
+	req.Header.Set("User-Agent", userAgent)
 
 	if c.debug {
 		fmt.Printf("Request: %v\n", req)
