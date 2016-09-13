@@ -656,6 +656,10 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 	resp, err = rt.RoundTrip(request)
 	PrintResponse(resp)
 
+	if resp == nil {
+		return nil, errors.New("Response from server is empty")
+	}
+
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
 		defer resp.Body.Close()
 		bytes, _ := ioutil.ReadAll(resp.Body)
