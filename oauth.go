@@ -298,6 +298,37 @@ func NewRSAConsumer(consumerKey string, privateKey *rsa.PrivateKey,
 	return consumer
 }
 
+// Creates a new Consumer instance, with a RSA signer
+//      - consumerKey:
+//        value you should obtain from the ServiceProvider when you register your
+//        application.
+//
+//      - privateKey:
+//        the private key to use for signatures
+//
+//      - hashFunc:
+//        the crypto.Hash to use for signatures
+//
+//      - serviceProvider:
+//        see the documentation for ServiceProvider for how to create this.
+//
+//      - httpClient:
+//        Provides a custom implementation of the httpClient used under the hood
+//        to make the request.  This is especially useful if you want to use
+//        Google App Engine. Can be nil for default.
+//
+func NewCustomRSAConsumer(consumerKey string, privateKey *rsa.PrivateKey, serviceProvider ServiceProvider,
+	httpClient *http.Client) *Consumer {
+	consumer := newConsumer(consumerKey, serviceProvider, httpClient)
+
+	consumer.signer = &RSASigner{
+		privateKey: privateKey,
+		rand:       cryptoRand.Reader,
+	}
+
+	return consumer
+}
+
 // Kicks off the OAuth authorization process.
 //      - callbackUrl:
 //        Authorizing a token *requires* redirecting to the service provider. This is the
