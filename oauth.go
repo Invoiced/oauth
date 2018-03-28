@@ -98,6 +98,7 @@ const (
 	LOC_MULTIPART
 	LOC_JSON
 	LOC_XML
+	LOC_SOAP
 )
 
 var userAgent string = "Invoiced"
@@ -565,6 +566,11 @@ func (c *Consumer) PostJson(url string, body string, token *AccessToken) (resp *
 func (c *Consumer) PostXML(url string, body string, token *AccessToken) (resp *http.Response, err error) {
 	return c.makeAuthorizedRequest("POST", url, LOC_XML, body, nil, token)
 }
+
+func (c *Consumer) PostSOAP(url string, body string, token *AccessToken) (resp *http.Response, err error) {
+	return c.makeAuthorizedRequest("POST", url, LOC_SOAP, body, nil, token)
+}
+
 func (c *Consumer) PostJSONWithParams(url string, body string, userParams map[string]string, token *AccessToken) (resp *http.Response, err error) {
 	return c.makeAuthorizedRequest("POST", url, LOC_JSON, body, userParams, token)
 }
@@ -657,6 +663,10 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 
 	if dataLocation == LOC_XML {
 		request.Header.Set("Content-Type", "application/xml")
+	}
+
+	if dataLocation == LOC_SOAP {
+		request.Header.Set("Content-Type", `text/xml; charset="utf-8"`)
 	}
 
 	if dataLocation == LOC_MULTIPART {
