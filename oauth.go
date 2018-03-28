@@ -522,6 +522,10 @@ func (c *Consumer) Get(url string, userParams map[string]string, token *AccessTo
 	return c.makeAuthorizedRequest("GET", url, LOC_URL, "", userParams, token)
 }
 
+func (c *Consumer) GetXML(url string, body string, token *AccessToken) (resp *http.Response, err error) {
+	return c.makeAuthorizedRequest("GET", url, LOC_XML, body, nil, token)
+}
+
 func encodeUserParams(userParams map[string]string) string {
 	data := url.Values{}
 	for k, v := range userParams {
