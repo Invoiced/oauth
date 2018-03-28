@@ -666,7 +666,7 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 	}
 
 	if dataLocation == LOC_SOAP {
-		request.Header.Set("Content-Type", "text/xml")
+		request.Header.Set("Content-Type", "text/xml; charset=utf-8")
 	}
 
 	if dataLocation == LOC_MULTIPART {
