@@ -3,6 +3,7 @@ package oauth
 import (
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -575,14 +576,14 @@ func TestSuccessfulAuthorizedMultipartPost_OldApi(t *testing.T) {
 	payload := "A bunch of data"
 
 	/*
-	expectedBody :=
-		"--UNITTESTBOUNDARY\n" +
-		"Content-Disposition: form-data; name=\"multipartname\"; filename=\"/no/matter\n" +
-		"Content-Type: application/octet-stream\n" +
-		"A bunch of data\n" +
-		"\n" +
-		"--UNITTESTBOUNDARY--\n";
-*/
+		expectedBody :=
+			"--UNITTESTBOUNDARY\n" +
+			"Content-Disposition: form-data; name=\"multipartname\"; filename=\"/no/matter\n" +
+			"Content-Type: application/octet-stream\n" +
+			"A bunch of data\n" +
+			"\n" +
+			"--UNITTESTBOUNDARY--\n";
+	*/
 	m.httpClient.ExpectPost(
 		"http://www.mrjon.es/unittest",
 		"", //expectedBody,
@@ -674,7 +675,7 @@ func Test404OnGet_NewApi(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	resp, err := authedClient.Get("http://www.mrjon.es/someurl")
 	if err != nil {
 		t.Fatal("The new API doesn't explicitly return an error in this case")
@@ -1090,4 +1091,21 @@ func (m *MockSigner) Debug(enabled bool) {}
 
 func (m *MockSigner) SignatureMethod() string {
 	return SIGNATURE_METHOD_HMAC_SHA1
+}
+
+func TestOutputTokenSignature(t *testing.T) {
+
+	account := "TSa"
+	consumerKey := "423424"
+	consumerSecret := "2ee94cc8370347"
+	token := "d44e0"
+	tokenSecret := "8931b52d78"
+
+	signature, nonce, timestamp, method := OutputTokenSignature(account, consumerKey, consumerSecret, token, tokenSecret)
+
+	log.Println(signature)
+	log.Println(nonce)
+	log.Println(timestamp)
+	log.Println(method)
+
 }

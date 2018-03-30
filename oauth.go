@@ -973,6 +973,23 @@ func (c *Consumer) baseParams(consumerKey string, additionalParams map[string]st
 	return params
 }
 
+//used by Netsuite
+func OutputTokenSignature(account, consumerKey, consumerSecret, token, tokenSecret string) (string, string, string, string) {
+
+	serviceProvider := ServiceProvider{}
+	c := NewConsumer(consumerKey, consumerSecret, serviceProvider)
+
+	nonce := strconv.FormatInt(c.clock.Seconds(), 10)
+	timestamp := strconv.FormatInt(c.nonceGenerator.Int63(), 10)
+
+	baseString := account + "&" + consumerKey + "&" + token + "&" + nonce + "&" + timestamp
+
+	signature, _ := c.signer.Sign(baseString, tokenSecret)
+
+	return signature, nonce, timestamp, c.signer.SignatureMethod()
+
+}
+
 func parseAdditionalData(parts url.Values) map[string]string {
 	params := make(map[string]string)
 	for key, value := range parts {
