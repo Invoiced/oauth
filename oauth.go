@@ -982,7 +982,7 @@ func OutputTokenSignature(account, consumerKey, consumerSecret, token, tokenSecr
 	nonce := strconv.FormatInt(c.clock.Seconds(), 10)
 	timestamp := strconv.FormatInt(c.nonceGenerator.Int63(), 10)
 
-	baseString := account + "&" + consumerKey + "&" + token + "&" + nonce + "&" + timestamp
+	baseString := escape(account) + "&" + escape(consumerKey) + "&" + escape(token) + "&" + escape(nonce) + "&" + escape(timestamp)
 
 	signature, _ := c.signer.Sign(baseString, tokenSecret)
 
