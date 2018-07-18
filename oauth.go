@@ -701,6 +701,8 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 	resp, err = rt.RoundTrip(request)
 	PrintResponse(resp)
 
+	request.Close = true
+
 	if resp == nil {
 		return nil, errors.New("Response from server is empty")
 	}
