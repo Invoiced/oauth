@@ -219,7 +219,7 @@ type Consumer struct {
 func newConsumer(consumerKey string, serviceProvider ServiceProvider, httpClient *http.Client) *Consumer {
 	clock := &defaultClock{}
 	if httpClient == nil {
-		httpClient = &http.Client{}
+		httpClient = &http.Client{Timeout: time.Second * 30}
 	}
 	return &Consumer{
 		consumerKey:     consumerKey,
@@ -496,7 +496,7 @@ func (c *Consumer) MakeRoundTripper(token *AccessToken) (*RoundTripper, error) {
 
 func (c *Consumer) MakeHttpClient(token *AccessToken) (*http.Client, error) {
 	return &http.Client{
-		Transport: &RoundTripper{consumer: c, token: token},
+		Transport: &RoundTripper{consumer: c, token: token}, Timeout: time.Second * 30,
 	}, nil
 }
 
