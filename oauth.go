@@ -218,8 +218,13 @@ type Consumer struct {
 
 func newConsumer(consumerKey string, serviceProvider ServiceProvider, httpClient *http.Client) *Consumer {
 	clock := &defaultClock{}
+
+	tr := &http.Transport{
+		IdleConnTimeout: 5 * time.Minute,
+	}
+
 	if httpClient == nil {
-		httpClient = &http.Client{Timeout: time.Minute * 5}
+		httpClient = &http.Client{Transport: tr, Timeout: time.Minute * 5}
 	}
 	return &Consumer{
 		consumerKey:     consumerKey,
