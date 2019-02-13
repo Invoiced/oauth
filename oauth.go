@@ -45,6 +45,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/Invoiced/accounting-sync/util"
 	"io"
 	"io/ioutil"
 	"log"
@@ -150,13 +151,17 @@ func (sp *ServiceProvider) httpMethod() string {
 }
 
 //Function to print out a http request
-func PrintResponse(resp *http.Response) {
+func PrintResponse(resp *http.Response, syncLogger *util.SyncLogger) {
 	if resp != nil {
 
 		d, err := httputil.DumpResponse(resp, true)
 
 		if err == nil {
-			log.Println("Dumping Response => ", string(d))
+			if syncLogger != nil {
+				syncLogger.INFO("Dumping Response => ", string(d))
+			} else {
+				log.Println("Dumping Response => ", string(d))
+			}
 		}
 
 	}
@@ -164,12 +169,16 @@ func PrintResponse(resp *http.Response) {
 }
 
 //Function to print out a http response
-func PrintRequest(req *http.Request) {
+func PrintRequest(req *http.Request, syncLogger *util.SyncLogger) {
 	if req != nil {
 		s, err := httputil.DumpRequestOut(req, true)
 
 		if err == nil {
-			log.Println("Dumping Request => ", string(s))
+			if syncLogger != nil {
+				syncLogger.INFO("Dumping Request => ", string(s))
+			} else {
+				log.Println("Dumping Request => ", string(s))
+			}
 		}
 
 	}
@@ -214,6 +223,7 @@ type Consumer struct {
 	clock          clock
 	nonceGenerator nonceGenerator
 	signer         signer
+	syncLogger     *util.SyncLogger
 }
 
 func newConsumer(consumerKey string, serviceProvider ServiceProvider, httpClient *http.Client) *Consumer {
@@ -333,6 +343,10 @@ func NewCustomRSAConsumer(consumerKey string, privateKey *rsa.PrivateKey, servic
 	}
 
 	return consumer
+}
+
+func (c *Consumer) SetSyncLogger(syncLogger *util.SyncLogger) {
+	c.syncLogger = syncLogger
 }
 
 // Kicks off the OAuth authorization process.
@@ -702,9 +716,9 @@ func (c *Consumer) makeAuthorizedRequestReader(method string, urlString string, 
 	}
 
 	rt := RoundTripper{consumer: c, token: token}
-	PrintRequest(request)
+	PrintRequest(request, c.syncLogger)
 	resp, err = rt.RoundTrip(request)
-	PrintResponse(resp)
+	PrintResponse(resp, c.syncLogger)
 
 	request.Close = true
 
@@ -1185,7 +1199,7 @@ func (c *Consumer) httpExecute(
 		fmt.Printf("Request: %v\n", req)
 	}
 
-	PrintRequest(req)
+	PrintRequest(req, c.syncLogger)
 
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
@@ -1214,7 +1228,7 @@ func (c *Consumer) httpExecute(
 		return resp, errors.New(string(bytes))
 	}
 
-	PrintResponse(resp)
+	PrintResponse(resp, c.syncLogger)
 	return resp, err
 }
 
